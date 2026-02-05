@@ -1,54 +1,47 @@
-# Technical Specification
+# Technical Contracts & Schemas
 
-## Purpose
-Define contracts, schemas, and persistence models for Chimera’s core systems. This document is the authoritative source for API shapes and data models.
-
-## API / Task Contracts
-### Task JSON Schema (Planner → Worker)
+## Task Payload (Planner → Redis → Worker)
 ```json
 {
-  "task_id": "string (UUID)",
-  "task_type": "enum: generate_caption | reply_comment | fetch_trends | execute_transfer",
-  "priority": "high | medium | low",
-  "context": {
-    "goal_id": "string",
-    "persona_id": "string",
-    "locale": "string",
-    "inputs": {}
-  },
-  "required_resources": ["mcp://twitter/mentions", "mcp://news/ethiopia/fashion"],
-  "created_at": "ISO-8601 timestamp"
+  "task_id": "uuidv7-string",
+  "agent_id": "uuid",
+  "campaign_id": "uuid",
+  "task_type": "perceive_trends | generate_text | generate_image | publish | transfer_usdc | ...",
+  "priority": "high|medium|low",
+  "created_at": "2026-02-05T15:49:00Z",
+  "input": { ... },
+  "required_mcp_resources": ["twitter://mentions", "news://ethiopia/fashion"],
+  "allowed_mcp_tools": ["ideogram_generate", "twitter_post"]
 }
 ```
 
-### MCP Tool Example
-```
-post_content: { platform, text_content, media_urls, disclosure_level }
+## Judge Output
+```json
+{
+  "task_id": "...",
+  "decision": "approve | reject | escalate",
+  "confidence": 0.87,
+  "reason": "Image matches character reference; caption on-brand",
+  "escalation_category": null
+}
 ```
 
-## Database Schema (High-Level ERD)
-### Entities
-- **Agents (PostgreSQL):** id, tenant_id, persona_id, wallet_address
-- **Campaigns:** id, agent_id, goal_description, status, budget_usdc
-- **Tasks:** id, campaign_id, task_type, status, result_json
-- **Memories (Weaviate):** vectorized chunks with metadata (timestamp, relevance, source)
-- **Financial Ledger:** on-chain (Base/Ethereum) + PostgreSQL mirror for queries
+## Persistence Overview
+- PostgreSQL: agents, campaigns, tasks, hitl_queue
+- Weaviate: AgentMemories collection (vectors + metadata)
+- Redis: task_queue, review_queue, short-term context, daily_spend counters
 
-### Mermaid ERD
+## Simple Mermaid ERD (video/media assets)
 ```mermaid
 erDiagram
-  AGENT ||--o{ CAMPAIGN : manages
-  CAMPAIGN ||--o{ TASK : decomposes_to
-  AGENT ||--|| WALLET : owns
-  AGENT ||--o{ MEMORY_CHUNK : references
+    AGENT ||--o{ CAMPAIGN : owns
+    CAMPAIGN ||--o{ MEDIA_ASSET : produces
+    MEDIA_ASSET ||--|| VIDEO_METADATA : details
+    VIDEO_METADATA {
+        uuid id PK
+        string s3_url
+        int duration_ms
+        float gen_cost_usd
+        jsonb params
+    }
 ```
-
-## Constraints
-- All data contracts must be versioned and backward-compatible.
-- Multi-tenant isolation enforced at the schema and access layers.
-- Wallet-related data must be encrypted at rest and in transit.
-
-## Acceptance Criteria
-- All services validate task payloads against the Task JSON Schema.
-- ERD coverage includes at least Agents, Campaigns, Tasks, Memory, Wallet.
-- MCP tool interfaces are defined before implementation.

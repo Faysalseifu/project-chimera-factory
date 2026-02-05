@@ -1,21 +1,17 @@
-# Tooling Strategy
+# Tooling & MCP Strategy
 
-## Purpose
-Define development MCP tools and runtime skills strategy for Chimera.
+## A. Developer Tools (MCP servers for YOU in Cursor)
+- filesystem-mcp → read/write project files safely
+- git-mcp → query commits, diffs, blame
+- tenx-mcp-sense → keep thinking trace (required)
+- sqlite-mcp → local test DB during dev
 
-## Developer Tools (MCP for Development)
-- **git-mcp:** Version control queries (diffs, blame).
-- **filesystem-mcp:** Safe file read/write in IDE.
-- **db-mcp (sqlite):** Local test DB.
-- **tenx-mcp-sense:** Continuous traceability.
+Document: connect these via Cursor extensions or terminal when needed.
 
-## Runtime Skills (Agent Capabilities)
-Skills are reusable functions/packages agents call via MCP or direct import.
+## B. Runtime Agent Skills (for Chimera agents)
+Skills = reusable capability packages (called via MCP wrapper or import)
 
-### Skill Requirements
-- Each skill must declare a JSON input/output contract.
-- Each skill must map back to specs/technical.md.
-
-## Acceptance Criteria
-- All listed tools are documented with intended usage.
-- At least three skill stubs exist with defined interfaces.
+Planned initial skills:
+- fetch_and_filter_trends
+- generate_consistent_image
+- autonomous_usdc_transfer

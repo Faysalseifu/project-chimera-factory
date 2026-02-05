@@ -1,55 +1,32 @@
-# Functional Requirements Specification
+# Functional Requirements – Chimera Agents
 
-## Purpose
-Define user stories and functional capabilities for Autonomous Influencer Agents, including acceptance criteria and escalation rules.
+## As Network Operator
+- Define natural-language campaign goals ("Promote Ethiopian fashion trends to Gen-Z")
+- Monitor fleet dashboard: wallet balances, HITL queue, daily spend, agent states
+- Approve/reject escalated items quickly
 
-## User Roles
-- **Network Operator:** Sets high-level goals (e.g., “Promote sneaker drop to Gen‑Z in Ethiopia”).
-- **HITL Moderator:** Reviews escalated content/transactions.
-- **Developer:** Extends MCP servers, skills, prompts.
+## As Autonomous Agent – I must be able to:
+1. **Perceive**  
+   Poll MCP resources → filter relevance (>0.75) → detect trends → create tasks
 
-## Agent Capabilities (User Stories)
-- **As an Agent, I need to perceive trends and mentions so that I can react timely.**
-  - Acceptance Criteria:
-    - Poll MCP Resources (twitter://mentions, news://ethiopia/fashion).
-    - Apply semantic filter.
-    - If relevance $> 0.75$, create a task in the queue.
+2. **Plan**  
+   Decompose goal into task DAG → re-plan on changes (news, budget, viral events)
 
-- **As an Agent, I need to decompose goals into executable tasks so that complex campaigns are parallelized.**
-  - Acceptance Criteria:
-    - Planner reads goal.
-    - Outputs a DAG of tasks.
-    - Pushes tasks to Redis TaskQueue.
+3. **Create content**  
+   Text: Gemini/Claude  
+   Image: consistent character (reference ID / LoRA)  
+   Video: tiered (cheap motion vs expensive full gen)
 
-- **As an Agent, I need to generate consistent multimodal content so that persona is maintained.**
-  - Acceptance Criteria:
-    - Worker uses MCP Tools (text: Gemini/Claude, image: Ideogram with character_reference_id, video: tiered strategy).
-    - Judge validates consistency (Vision API check).
+4. **Act**  
+   Publish/reply via MCP tools with AI label  
+   Execute transfers after CFO approval
 
-- **As an Agent, I need to engage bi-directionally so that interactions feel natural.**
-  - Acceptance Criteria:
-    - Full loop: Ingest → Plan → Generate → Act (via MCP) → Judge.
+5. **Govern self**  
+   Check balance before spend  
+   Auto-disclose AI identity when asked  
+   Store successful interactions in memory
 
-- **As an Agent, I need to manage finances autonomously so that I can self-sustain.**
-  - Acceptance Criteria:
-    - Non-custodial wallet.
-    - Check balance before spend.
-    - CFO Judge enforces daily limits.
-    - On-chain transfers recorded.
-
-- **As an Agent, I need to disclose AI nature when asked so that compliance is met.**
-  - Acceptance Criteria:
-    - Honesty Directive overrides persona on direct queries.
-
-## HITL Escalation Rules
-- Confidence $> 0.90$: Auto-approve
-- $0.70 \leq$ Confidence $\leq 0.90$: Async pending
-- Confidence $< 0.70$ or sensitive topic: Mandatory HITL
-
-## Constraints
-- All behaviors must be traceable to specs/_meta.md.
-- No implementation code before tests are written (TDD-first).
-
-## Acceptance Criteria (Spec-Level)
-- All functional stories include measurable acceptance criteria.
-- Escalation rules are enforced for all content and finance actions.
+## HITL & Confidence Tiers
+- ≥ 0.92 → auto-publish  
+- 0.75–0.91 → async HITL (agent continues)  
+- < 0.75 or politics/health/finance/legal → block + HITL

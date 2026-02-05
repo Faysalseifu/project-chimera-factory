@@ -1,40 +1,21 @@
-# Project Chimera: Master Meta Specification
-
-## Purpose
-Define the high-level vision, non-negotiable constraints, and success criteria for Project Chimera. This document anchors all downstream specs and provides the basis for traceability.
+# Project Chimera – Meta Specification
 
 ## Vision
-Build a factory for Autonomous Influencer Agents: persistent, goal-directed digital entities that perceive trends, generate multimodal content, engage audiences, and manage on-chain commerce autonomously. Shift from scripted bots to a swarm-orchestrated network using the FastRender pattern (Planner–Worker–Judge), MCP for external connectivity, hierarchical memory, and Coinbase AgentKit wallets.
+Factory for **autonomous AI influencers**: persistent agents that research trends, plan content, generate multimodal posts (text/image/video), engage audiences naturally, and manage on-chain wallets/transactions with almost no human input.
 
-## Scope
-- Defines vision, constraints, business models, and architectural pillars.
-- Does not include implementation details.
+## Core Decisions (aligned with SRS 2026)
+- Architecture: FastRender swarm → Planner (decomposes goals), Workers (execute atomic tasks), Judge (quality + HITL gating + OCC)
+- External world access: **Only via MCP** (no direct API calls in agent logic)
+- Memory: Redis (short-term episodic) + Weaviate (long-term semantic RAG)
+- Commerce: Coinbase AgentKit → non-custodial wallets on Base
+- Safety: Confidence scoring + CFO Judge + mandatory HITL on sensitive topics
+- Scalability: Kubernetes auto-scaling, target 1,000+ agents
 
-## Core Constraints
-- **Spec-Driven Development (SDD):** No implementation code until specs are ratified and tests are written (failing TDD).
-- **Traceability:** All code must link back to these specs via comments or PR descriptions.
-- **Scalability Target:** Support 1,000+ concurrent agents with auto-scaling.
-- **Security:** Multi-tenancy isolation; non-custodial wallets encrypted via secrets manager.
-- **Compliance:** EU AI Act self-disclosure; HITL for sensitive topics.
-- **Cost Control:** Resource Governor to cap inference/media generation spend.
+## Hard Rules / Constraints
+- Spec-Driven: No code until specs + failing tests exist
+- Traceability: Every code change must link to a spec section
+- No vibe coding: Follow TDD + strict schemas
+- Compliance: Auto AI disclosure on posts + honesty directive on "are you AI?" questions
+- Cost: Hard per-agent daily budget enforced by Judge
 
-## Business Models Supported
-- In-house Digital Talent Agency
-- PaaS for brands/agencies
-- Hybrid ecosystem with OpenClaw/Moltbook integration potential
-
-## Key Architectural Pillars
-- FastRender Swarm (Planner → TaskQueue → Workers → Judge with OCC)
-- MCP Hub-and-Spoke integration model
-- Hybrid Persistence (Weaviate semantic + PostgreSQL transactional + Redis queues)
-- Agentic Commerce via Coinbase AgentKit
-
-## Acceptance Criteria
-- All new features reference a spec in specs/ and cite the relevant section.
-- All planned components map to one or more architectural pillars.
-- Non-negotiable constraints are verified in tests or review checklists before merge.
-
-## Out of Scope
-- UI/UX design details
-- Vendor-specific implementation choices
-- Production deployment details
+Last updated: 2026-02-05

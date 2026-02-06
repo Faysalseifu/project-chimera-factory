@@ -5,4 +5,4 @@ reviews:
     - Ensure code aligns with /specs/*.md
     - Check for TDD coverage
     - No direct API calls; use MCP
-    - Flag security issues (secrets, etc.)
+    - Flag security issues (secrets, injection, unsafe deserialization)

@@ -1,4 +1,4 @@
-.PHONY: help setup test lint docker-build docker-test clean
+.PHONY: help setup test lint docker-build docker-test spec-check clean
 
 help:  ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -7,8 +7,8 @@ setup:  ## Install dependencies
 	pip install --upgrade pip
 	pip install -r requirements-dev.txt
 
-test:  ## Run tests
-	pytest -v
+test: docker-build  ## Run tests in Docker
+	docker run --rm chimera-factory
 
 lint:  ## Run ruff lint + format
 	ruff check --fix .
@@ -19,6 +19,9 @@ docker-build:  ## Build Docker image
 
 docker-test:  ## Run tests inside Docker
 	docker run --rm chimera-factory
+
+spec-check:  ## Verify repo aligns with specs
+	python scripts/spec_check.py
 
 clean:  ## Clean up
 	rm -rf .venv __pycache__ *.egg-info .pytest_cache .ruff_cache

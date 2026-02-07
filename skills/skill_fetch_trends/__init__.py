@@ -1,0 +1,1 @@
+"""Fetch trends skill package."""
